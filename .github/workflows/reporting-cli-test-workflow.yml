@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         java: [11]
         node-version: [14.x]
         opensearch-version: [ latest ]
@@ -69,7 +69,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v1
         with:
-          name: opensearch-reporting-cli-${{ env.CLI_VERSION }}-linux
+          name: opensearch-reporting-cli-${{ env.CLI_VERSION }}-${{ matrix.os }}
           path: ./opensearch-reporting-cli-${{ env.CLI_VERSION }}.tgz
       
       - name: Clean up container
