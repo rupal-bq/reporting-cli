@@ -12,7 +12,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        java: [11]
         node-version: [14.x]
         opensearch-version: [ latest ]
     
@@ -23,6 +22,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Configure sysctl limits
+      if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           sudo sysctl -w fs.file-max=262144
           sudo sysctl -w vm.max_map_count=262144
