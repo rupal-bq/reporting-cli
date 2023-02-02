@@ -31,7 +31,8 @@ jobs:
         if: ${{ matrix.os == 'macos-latest' }}
         uses: docker-practice/actions-setup-docker@master
         timeout-minutes: 12
-        run: |
+
+      - run: |
           set -x
           docker version
           docker run --rm hello-world
