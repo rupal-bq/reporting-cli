@@ -37,15 +37,8 @@ jobs:
           docker-machine env default
 
       - name: Download and run Opensearch and Dashboard
-        if: ${{ matrix.os == 'windows-latest' }}
         run: |
-          stack --compiler ghc-${{ matrix.ghc-ver }} exec -- wget https://opensearch.org/samples/docker-compose.yml
-          docker-compose up --detach
-
-      - name: Download and run Opensearch and Dashboard
-        if: ${{ matrix.os != 'windows-latest' }}
-        run: |
-          wget https://opensearch.org/samples/docker-compose.yml
+          curl -O https://opensearch.org/samples/docker-compose.yml
           docker-compose up --detach
       
       - name: Check Docker containers
