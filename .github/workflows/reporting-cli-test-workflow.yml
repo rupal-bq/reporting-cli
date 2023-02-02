@@ -32,11 +32,6 @@ jobs:
         uses: docker-practice/actions-setup-docker@master
         timeout-minutes: 12
 
-      - run: |
-          set -x
-          docker version
-          docker run --rm hello-world
-
       - name: Download and run Opensearch and Dashboard
         run: |
           curl -O https://opensearch.org/samples/docker-compose.yml
@@ -44,10 +39,6 @@ jobs:
       
       - name: Check Docker containers
         run: docker ps -a
-
-      - name: Sleep for 200s seconds
-        run: sleep 200s
-        shell: bash
 
       - name: Wait for cluster to start
         uses: nick-fields/retry@v2
