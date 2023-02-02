@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         node-version: [14.x]
         opensearch-version: [ latest ]
     
@@ -32,13 +32,35 @@ jobs:
         uses: docker-practice/actions-setup-docker@master
         timeout-minutes: 12
 
+      - name: Enable longer filenames
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: git config --system core.longpaths true
+
       - name: Download and run Opensearch and Dashboard
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          curl https://artifacts.opensearch.org/releases/bundle/opensearch/2.5.0/opensearch-2.5.0-windows-x64.zip
+          Expand-Archive -Path ./opensearch-2.5.0-windows-x64.zip -DestinationPath ./
+          cd .\opensearch-2.5.0-windows-x64\opensearch-2.5.0
+          .\opensearch-windows-install.bat
+          curl https://artifacts.opensearch.org/releases/bundle/opensearch-dashboards/2.5.0/opensearch-dashboards-2.5.0-windows-x64.zip
+          Expand-Archive -Path ./opensearch-dashboards-2.5.0-windows-x64.zip -DestinationPath ./
+          cd .\opensearch-2.5.0-windows-x64\opensearch-dashboards-2.5.0
+          .\bin\opensearch-dashboards.bat
+
+      - name: Download and run Opensearch and Dashboard
+        if: ${{ matrix.os != 'windows-latest' }}
         run: |
           curl -O https://opensearch.org/samples/docker-compose.yml
           docker-compose up --detach
       
       - name: Check Docker containers
         run: docker ps -a
+
+      - name: Sleep for 200s seconds
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: sleep 200s
+        shell: bash
 
       - name: Wait for cluster to start
         uses: nick-fields/retry@v2
