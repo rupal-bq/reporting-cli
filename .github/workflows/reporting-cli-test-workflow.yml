@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest]
         node-version: [14.x]
         opensearch-version: [ latest ]
     
@@ -26,6 +26,11 @@ jobs:
         run: |
           sudo sysctl -w fs.file-max=262144
           sudo sysctl -w vm.max_map_count=262144
+
+      - name: Set the DOCKER_CLI_EXPERIMENTAL value
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          echo "DOCKER_CLI_EXPERIMENTAL=enabled" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Install docker # Taken from https://github.com/actions/virtual-environments/issues/1143#issuecomment-652264388
         if: ${{ matrix.os == 'macos-latest' }}
