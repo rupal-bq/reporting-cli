@@ -4,16 +4,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { program, Option } from 'commander';
-import { exit } from 'process';
-import ora from 'ora';
-import { AUTH, CLI_COMMAND_NAME, DEFAULT_AUTH, DEFAULT_FILENAME, DEFAULT_FORMAT, DEFAULT_MIN_HEIGHT, DEFAULT_TENANT, DEFAULT_WIDTH, ENV_VAR, FORMAT, TRANSPORT_TYPE, DEFAULT_EMAIL_SUBJECT } from './constants.js';
-import dotenv from "dotenv";
+const { program, Option } = require('commander');
+const { exit } = require('process');
+const fs = require('fs');
+const ora = require('ora');
+const { AUTH, CLI_COMMAND_NAME, DEFAULT_AUTH, DEFAULT_FILENAME, DEFAULT_FORMAT, DEFAULT_MIN_HEIGHT, DEFAULT_TENANT, DEFAULT_WIDTH, ENV_VAR, FORMAT, TRANSPORT_TYPE, DEFAULT_EMAIL_SUBJECT, DEFAULT_EMAIL_NOTE } = require('./constants.js');
+const dotenv = require("dotenv");
 dotenv.config();
+const spinner = ora('');
 
-const spinner = ora();
-
-export async function getCommandArguments() {
+async function getCommandArguments() {
 
     program
         .name(CLI_COMMAND_NAME)
@@ -56,9 +56,12 @@ export async function getCommandArguments() {
             .env(ENV_VAR.SMTP_USERNAME))
         .addOption(new Option('--smtppassword <password>', 'smtp password')
             .env(ENV_VAR.SMTP_PASSWORD))
-        .addOption(new Option('--subject <subject>', 'email Subject')
+        .addOption(new Option('--subject <subject>', 'email subject')
             .default(DEFAULT_EMAIL_SUBJECT)
             .env(ENV_VAR.EMAIL_SUBJECT))
+        .addOption(new Option('--note <note>', 'email body (string or path to text file)')
+            .default(DEFAULT_EMAIL_NOTE)
+            .env(ENV_VAR.EMAIL_NOTE))
 
     program.addHelpText('after', `
 Note: The tenant in the url has the higher priority than tenant value provided as command option.`);
@@ -67,6 +70,27 @@ Note: The tenant in the url has the higher priority than tenant value provided a
     const options = program.opts();
     spinner.start('Fetching the arguments values');
     return getOptions(options);
+}
+
+async function getEventArguments(event) {
+    if (event.auth === undefined)
+        event['auth'] = DEFAULT_AUTH;
+    if (event.tenant === undefined)
+        event['tenant'] = DEFAULT_TENANT;
+    if (event.format === undefined)
+        event['format'] = DEFAULT_FORMAT;
+    if (event.width === undefined)
+        event['width'] = DEFAULT_WIDTH;
+    if (event.height === undefined)
+        event['height'] = DEFAULT_MIN_HEIGHT;
+    if (event.filename === undefined)
+        event['filename'] = DEFAULT_FILENAME;
+    if (event.subject === undefined)
+        event['subject'] = DEFAULT_EMAIL_SUBJECT;
+    if (event.note === undefined)
+        event['note'] = DEFAULT_EMAIL_NOTE;
+
+    return getOptions(event);
 }
 
 function getOptions(options) {
@@ -90,6 +114,8 @@ function getOptions(options) {
         smtppassword: null,
         subject: null,
         time: null,
+        note: null,
+        emailbody: null
     }
 
     // Set url.
@@ -144,9 +170,11 @@ function getOptions(options) {
     // Set default filename is not specified.
     commandOptions.filename = options.filename || process.env[ENV_VAR.FILENAME];
     commandOptions.filename = options.filename === DEFAULT_FILENAME
-        ? `${commandOptions.filename}-${commandOptions.time.toISOString()}.${commandOptions.format}`
-        : `${commandOptions.filename}.${commandOptions.format}`
+        ? `${commandOptions.filename}-${commandOptions.time.toISOString().replace(/:/g, '-')}.${commandOptions.format}`
+        : `${commandOptions.filename}.${commandOptions.format}`;
 
+    // Set name for email body report image
+    commandOptions.emailbody = `email-body-${commandOptions.time.toISOString().replace(/:/g, '-')}.png`
 
     // Set width and height of the window
     commandOptions.width = Number(options.width);
@@ -169,6 +197,30 @@ function getOptions(options) {
     // Set email subject.
     commandOptions.subject = options.subject || process.env[ENV_VAR.EMAIL_SUBJECT];
 
-    spinner.succeed('Fetched argument values')
+    // Set email note.
+    commandOptions.note = options.note || process.env[ENV_VAR.EMAIL_NOTE];
+    if (commandOptions.note !== DEFAULT_EMAIL_NOTE && fs.existsSync(commandOptions.note)) {
+        commandOptions.note = fs.readFileSync(commandOptions.note, "utf8");
+    }
+    commandOptions.note = getHtml(commandOptions.note);
+
+    spinner.succeed('Fetched argument values');
     return commandOptions;
+}
+
+// Convert text to html
+function getHtml(text) {
+    text = (text || "");
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\t/g, "    ")
+        .replace(/ /g, "&#8203;&nbsp;&#8203;")
+        .replace(/\r\n|\r|\n/g, "<br />");
+}
+
+module.exports = {
+    getCommandArguments,
+    getEventArguments
 }

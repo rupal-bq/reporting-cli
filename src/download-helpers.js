@@ -3,15 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import puppeteer from 'puppeteer';
-import fs from 'fs';
-import { FORMAT, REPORT_TYPE, SELECTOR, AUTH, URL_SOURCE } from './constants.js';
-import { exit } from "process";
-import ora from 'ora';
+const puppeteer = require('puppeteer');
+const fs = require('fs');
+const { FORMAT, REPORT_TYPE, AUTH, URL_SOURCE } = require('./constants.js');
+const exit = require('process');
+const ora = require('ora');
+const spinner = ora('');
 
-const spinner = ora();
-
-export async function downloadReport(url, format, width, height, filename, authType, username, password, tenant, time) {
+module.exports = async function downloadReport(url, format, width, height, filename, authType, username, password, tenant, time, transport, emailbody) {
   spinner.start('Connecting to url ' + url);
   try {
     const browser = await puppeteer.launch({
@@ -20,10 +19,12 @@ export async function downloadReport(url, format, width, height, filename, authT
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-gpu',
+        '--disable-dev-shm-usage',
         '--no-zygote',
         '--font-render-hinting=none',
         '--enable-features=NetworkService',
         '--ignore-certificate-errors',
+        '--single-process'
       ],
       executablePath: process.env.CHROMIUM_PATH,
       ignoreHTTPSErrors: true,
@@ -93,7 +94,7 @@ export async function downloadReport(url, format, width, height, filename, authT
     }
 
     // force wait for any resize to load after the above DOM modification.
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 2000));
     await waitForDynamicContent(page);
     let buffer;
     spinner.text = `Downloading Report...`;
@@ -132,12 +133,19 @@ export async function downloadReport(url, format, width, height, filename, authT
       }
     }
 
-    await browser.close();
-
     const timeCreated = time.valueOf();
     const data = { timeCreated, dataUrl: buffer.toString('base64'), };
-
     await readStreamToFile(data.dataUrl, filename, format);
+
+    if (transport !== undefined) {
+      const emailTemplateImageBuffer = await page.screenshot({
+        fullPage: true,
+      });
+      const data = { timeCreated, dataUrl: emailTemplateImageBuffer.toString('base64'), };
+      await readStreamToFile(data.dataUrl, emailbody, FORMAT.PNG);
+    }
+
+    await browser.close();
     spinner.succeed('The report is downloaded');
   } catch (e) {
     spinner.fail('Downloading report failed. ' + e);
