@@ -46,15 +46,11 @@ jobs:
         run: |
           Remove-item alias:curl
           curl -LJO https://artifacts.opensearch.org/releases/bundle/opensearch/2.5.0/opensearch-2.5.0-windows-x64.zip
-          ls
           Expand-Archive -Path .\opensearch-2.5.0-windows-x64.zip -DestinationPath .\
-          ls
           cd .\opensearch-2.5.0
           Start-Process -FilePath ".\opensearch-windows-install.bat"
           curl -LJO https://artifacts.opensearch.org/releases/bundle/opensearch-dashboards/2.5.0/opensearch-dashboards-2.5.0-windows-x64.zip
-          ls
           Expand-Archive -Path .\opensearch-dashboards-2.5.0-windows-x64.zip -DestinationPath .\
-          ls
           cd .\opensearch-dashboards-2.5.0
           Start-Process -FilePath ".\bin\opensearch-dashboards.bat"
 
@@ -69,7 +65,6 @@ jobs:
         run: docker ps -a
 
       - name: Sleep for 200s seconds
-        if: ${{ matrix.os == 'ubuntu-latest' }}
         run: sleep 200s
         shell: bash
 
@@ -103,7 +98,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v1
         with:
-          name: opensearch-reporting-cli-${{ env.CLI_VERSION }}-${{ matrix.os }}
+          name: opensearch-reporting-cli-${{ env.CLI_VERSION }}
           path: ./opensearch-reporting-cli-${{ env.CLI_VERSION }}.tgz
       
       - name: Clean up container
