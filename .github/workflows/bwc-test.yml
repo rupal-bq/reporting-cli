@@ -8,10 +8,9 @@ jobs:
 
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
         opensearch-version: [ "2.5.0", "1.3.8" ]
     
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Reporting CLI
@@ -26,6 +25,7 @@ jobs:
         run: |
           wget https://opensearch.org/samples/docker-compose.yml
           sed -i 's/latest/${{ matrix.opensearch-version }}/g' docker-compose.yml
+          cat docker-compose.yml
           docker-compose up --detach
       
       - name: Check Docker containers
