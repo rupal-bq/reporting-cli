@@ -48,11 +48,11 @@ jobs:
           curl -LJO https://artifacts.opensearch.org/releases/bundle/opensearch/2.5.0/opensearch-2.5.0-windows-x64.zip
           Expand-Archive -Path .\opensearch-2.5.0-windows-x64.zip -DestinationPath .\
           cd .\opensearch-2.5.0
-          .\opensearch-windows-install.bat
+          Start-Process -FilePath ".\opensearch-windows-install.bat"
           curl -LJO https://artifacts.opensearch.org/releases/bundle/opensearch-dashboards/2.5.0/opensearch-dashboards-2.5.0-windows-x64.zip
           Expand-Archive -Path .\opensearch-dashboards-2.5.0-windows-x64.zip -DestinationPath .\
           cd .\opensearch-dashboards-2.5.0
-          .\bin\opensearch-dashboards.bat
+          Start-Process -FilePath ".\bin\opensearch-dashboards.bat"
 
       - name: Download and run Opensearch and Dashboard
         if: ${{ matrix.os != 'windows-latest' }}
