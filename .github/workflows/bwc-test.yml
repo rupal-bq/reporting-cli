@@ -32,7 +32,6 @@ jobs:
         run: docker ps -a
 
       - name: Sleep for 200s seconds
-        if: ${{ matrix.os == 'ubuntu-latest' }}
         run: sleep 200s
         shell: bash
 
