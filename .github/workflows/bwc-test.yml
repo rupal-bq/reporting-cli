@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        opensearch-version: [ "1.3.8" ]
+        opensearch-version: [ "2.5.0", "2.4.1", "2.3.0", "1.3.8" ]
     
     runs-on: ubuntu-latest
 
@@ -25,14 +25,13 @@ jobs:
         run: |
           wget https://opensearch.org/samples/docker-compose.yml
           sed -i 's/latest/${{ matrix.opensearch-version }}/g' docker-compose.yml
-          cat docker-compose.yml
           docker-compose up --detach
       
       - name: Check Docker containers
         run: docker ps -a
 
-      - name: Sleep for 200s seconds
-        run: sleep 200s
+      - name: Sleep for 400s seconds
+        run: sleep 400s
         shell: bash
 
       - name: Wait for cluster to start

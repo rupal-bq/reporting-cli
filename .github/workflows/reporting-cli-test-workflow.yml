@@ -12,8 +12,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        node-version: [14.x]
-        opensearch-version: [ latest ]
     
     runs-on: ${{ matrix.os }}
 
@@ -45,12 +43,16 @@ jobs:
       - name: Download and run Opensearch and Dashboard
         if: ${{ matrix.os == 'windows-latest' }}
         run: |
-          wget https://artifacts.opensearch.org/releases/bundle/opensearch/2.5.0/opensearch-2.5.0-windows-x64.zip
+          curl -LJO https://artifacts.opensearch.org/releases/bundle/opensearch/2.5.0/opensearch-2.5.0-windows-x64.zip
+          ls
           Expand-Archive -Path .\opensearch-2.5.0-windows-x64.zip -DestinationPath .\
+          ls
           cd .\opensearch-2.5.0
           Start-Process -FilePath ".\opensearch-windows-install.bat"
-          wget https://artifacts.opensearch.org/releases/bundle/opensearch-dashboards/2.5.0/opensearch-dashboards-2.5.0-windows-x64.zip
+          curl -LJO https://artifacts.opensearch.org/releases/bundle/opensearch-dashboards/2.5.0/opensearch-dashboards-2.5.0-windows-x64.zip
+          ls
           Expand-Archive -Path .\opensearch-dashboards-2.5.0-windows-x64.zip -DestinationPath .\
+          ls
           cd .\opensearch-dashboards-2.5.0
           Start-Process -FilePath ".\bin\opensearch-dashboards.bat"
 
