@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     
     runs-on: ${{ matrix.os }}
 
@@ -42,7 +42,9 @@ jobs:
 
       - name: Download and run Opensearch and Dashboard
         if: ${{ matrix.os == 'windows-latest' }}
+        shell: powershell
         run: |
+          Remove-item alias:curl
           curl -LJO https://artifacts.opensearch.org/releases/bundle/opensearch/2.5.0/opensearch-2.5.0-windows-x64.zip
           ls
           Expand-Archive -Path .\opensearch-2.5.0-windows-x64.zip -DestinationPath .\
@@ -63,6 +65,7 @@ jobs:
           docker-compose up --detach
       
       - name: Check Docker containers
+        if: ${{ matrix.os != 'windows-latest' }}
         run: docker ps -a
 
       - name: Sleep for 200s seconds
