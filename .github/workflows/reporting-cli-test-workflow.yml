@@ -39,7 +39,7 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' }}
         run: git config --system core.longpaths true
 
-      - name: Download and run Opensearch and Dashboard
+      - name: Download and run Opensearch
         if: ${{ matrix.os == 'windows-latest' }}
         shell: powershell
         run: |
@@ -47,11 +47,22 @@ jobs:
           curl -LJO https://artifacts.opensearch.org/releases/bundle/opensearch/2.5.0/opensearch-2.5.0-windows-x64.zip
           Expand-Archive -Path .\opensearch-2.5.0-windows-x64.zip -DestinationPath .\
           cd .\opensearch-2.5.0
-          Start-Process -FilePath ".\opensearch-windows-install.bat"
+          .\opensearch-windows-install.bat
+
+      - name: Download and run Dashboard
+        if: ${{ matrix.os == 'windows-latest' }}
+        shell: powershell
+        run: |
+          Remove-item alias:curl
           curl -LJO https://artifacts.opensearch.org/releases/bundle/opensearch-dashboards/2.5.0/opensearch-dashboards-2.5.0-windows-x64.zip
           Expand-Archive -Path .\opensearch-dashboards-2.5.0-windows-x64.zip -DestinationPath .\
           cd .\opensearch-dashboards-2.5.0
-          Start-Process -FilePath ".\bin\opensearch-dashboards.bat"
+          .\bin\opensearch-dashboards.bat
+      
+      - name: Sleep for 200 seconds
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: Start-Sleep -s 200
+        shell: powershell
 
       - name: Download and run Opensearch and Dashboard
         if: ${{ matrix.os != 'windows-latest' }}
@@ -64,6 +75,7 @@ jobs:
         run: docker ps -a
 
       - name: Sleep for 200s seconds
+        if: ${{ matrix.os != 'windows-latest' }}
         run: sleep 200
         shell: bash
 
@@ -82,6 +94,7 @@ jobs:
           curl -XPOST -u 'admin:admin' 'http://localhost:5601/api/sample_data/flights' -H 'osd-xsrf:true'  -H 'securitytenant: admin_tenant'
 
       - name: Sleep for 100s seconds
+        if: ${{ matrix.os != 'windows-latest' }}
         run: sleep 100
         shell: bash
 
