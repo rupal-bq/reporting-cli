@@ -28,9 +28,9 @@ jobs:
 
       - name: Download and run Opensearch and Dashboard
         run: |
-          wget https://opensearch.org/samples/docker-compose.yml
-          sed -i 's/latest/${{ matrix.opensearch-version }}/g' docker-compose.yml
-          docker-compose up --detach
+          docker run -d -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" opensearchproject/opensearch:${{opensearch-version}}
+          docker pull opensearchproject/opensearch-dashboards:${{opensearch-version}}
+          docker run -d -it --network="host" opensearchproject/opensearch-dashboards:${{opensearch-version}}
       
       - name: Check Docker containers
         run: docker ps -a
