@@ -28,9 +28,9 @@ jobs:
 
       - name: Download and run Opensearch and Dashboard
         run: |
-          docker run -d -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" opensearchproject/opensearch:${{ matrix.opensearch-version }}
+          docker run --name opensearch -d -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" opensearchproject/opensearch:${{ matrix.opensearch-version }}
           docker pull opensearchproject/opensearch-dashboards:${{ matrix.opensearch-version }}
-          docker run -d -it --network="host" opensearchproject/opensearch-dashboards:${{ matrix.opensearch-version }}
+          docker run  --name dashboard -d -it --network="host" opensearchproject/opensearch-dashboards:${{ matrix.opensearch-version }}
       
       - name: Check Docker containers
         run: docker ps -a
@@ -61,4 +61,5 @@ jobs:
       - name: Clean up container
         if: always()
         run: |
-          docker-compose down
+          docker stop opensearch
+          docker stop dashboard
