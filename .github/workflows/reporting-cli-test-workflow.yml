@@ -64,7 +64,7 @@ jobs:
         run: docker ps -a
 
       - name: Sleep for 200s seconds
-        run: sleep 200s
+        run: sleep 200
         shell: bash
 
       - name: Wait for cluster to start
@@ -82,7 +82,7 @@ jobs:
           curl -XPOST -u 'admin:admin' 'http://localhost:5601/api/sample_data/flights' -H 'osd-xsrf:true'  -H 'securitytenant: admin_tenant'
 
       - name: Sleep for 100s seconds
-        run: sleep 100s
+        run: sleep 100
         shell: bash
 
       - name: Run integration tests
