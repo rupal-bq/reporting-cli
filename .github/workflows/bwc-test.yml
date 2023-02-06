@@ -28,9 +28,9 @@ jobs:
 
       - name: Download and run Opensearch and Dashboard
         run: |
-          docker run -d -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" opensearchproject/opensearch:${{ opensearch-version }}
-          docker pull opensearchproject/opensearch-dashboards:${{ opensearch-version }}
-          docker run -d -it --network="host" opensearchproject/opensearch-dashboards:${{ opensearch-version }}
+          docker run -d -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" opensearchproject/opensearch:${{ matrix.opensearch-version }}
+          docker pull opensearchproject/opensearch-dashboards:${{ matrix.opensearch-version }}
+          docker run -d -it --network="host" opensearchproject/opensearch-dashboards:${{ matrix.opensearch-version }}
       
       - name: Check Docker containers
         run: docker ps -a
