@@ -41,7 +41,7 @@ describe('download report errors', () => {
   }, 150000);
 
   test('saved search error', async () => {
-    let result = await cli(['-u', `${url}/app/data-explorer/discover/#/`, '-a', 'basic', '-c', credentials, '-f', 'csv'], '.');
+    let result = await cli(['-u', `${url}/_dashboards/app/data-explorer/discover/#/`, '-a', 'basic', '-c', credentials, '-f', 'csv'], '.');
     expect(result.code).toBe(1);
     expect(result.stderr).toContain('Please save search and retry');
   }, 150000);
