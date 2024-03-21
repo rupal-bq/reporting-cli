@@ -6,7 +6,7 @@
 const path = require('path');
 const exec = require('child_process').exec;
 const url = "http://localhost:5601";
-const credentials = "admin:myStrongPassword123!"
+const credentials = "admin:admin"
 
 function cli(args, cwd) {
   return new Promise(resolve => {
