@@ -28,6 +28,7 @@ const SELECTOR = {
   DASHBOARD: '#dashboardViewport',
   VISUALIZATION: '.visEditor__content',
   NOTEBOOK: '.euiPageBody',
+  NEW_DISCOVER: "/app/data-explorer/discover#",
   DISCOVER: 'button[id="downloadReport"]'
 }
 
