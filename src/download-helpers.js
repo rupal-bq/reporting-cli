@@ -126,7 +126,6 @@ module.exports = async function downloadReport(url, format, width, height, filen
         let response = await catcher;
         let payload = await response.json();
         buffer = payload.data;
-        console.log("buffer: "+buffer);
       } else {
         spinner.fail('Please save search and retry');
         process.exit(1);
@@ -135,11 +134,9 @@ module.exports = async function downloadReport(url, format, width, height, filen
 
     const timeCreated = time.valueOf();
     const data = { timeCreated, dataUrl: buffer.toString('base64'), };
-    console.log("reading stream to file")
     await readStreamToFile(data.dataUrl, filename, format);
 
     if (transport !== undefined) {
-      console.log("get email template");
       const emailTemplateImageBuffer = await page.screenshot({
         fullPage: true,
       });
